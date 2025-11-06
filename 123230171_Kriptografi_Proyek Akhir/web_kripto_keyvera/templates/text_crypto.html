@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enkripsi / Dekripsi Teks - KeyVera</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            poppins: ['Poppins', 'sans-serif'],
+          },
+          colors: {
+            primary: '#FF6B39',
+            secondary: '#2f3640',
+            light: '#f5f6fa',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-light font-poppins text-secondary min-h-screen">
+  <div class="max-w-6xl mx-auto p-6">
+    <h2 class="text-3xl font-bold text-center mb-2">Enkripsi / Dekripsi Teks</h2>
+    <p class="text-center text-gray-600 mb-8">
+      <a href="/" class="text-primary hover:underline font-medium">⬅️ Kembali ke Dashboard</a>
+    </p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="mb-6 space-y-2">
+        {% for category, message in messages %}
+          <li class="bg-green-100 border border-green-300 text-green-700 px-4 py-2 rounded-lg">
+            {{ message }}
+          </li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Tabs -->
+    <div class="flex border-b border-gray-300 mb-6 overflow-x-auto">
+      <button onclick="openTab(event, 'chacha')" class="tab-button px-5 py-2 font-semibold text-gray-600 hover:text-primary border-b-2 border-transparent focus:outline-none">ChaCha20</button>
+      <button onclick="openTab(event, 'adfgx')" class="tab-button px-5 py-2 font-semibold text-gray-600 hover:text-primary border-b-2 border-transparent focus:outline-none">ADFGX Cipher</button>
+      <button onclick="openTab(event, 'super')" class="tab-button px-5 py-2 font-semibold text-gray-600 hover:text-primary border-b-2 border-transparent focus:outline-none">Algoritma Super</button>
+    </div>
+
+    <!-- ========== CHACHA20 ========== -->
+    <div id="chacha" class="tab-content">
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Enkripsi -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <h3 class="text-lg font-semibold text-primary mb-4">🔒 Enkripsi ChaCha20</h3>
+          <form action="{{ url_for('crypto_bp.encrypt_chacha') }}" method="POST" class="space-y-4">
+            <div>
+              <label for="enc_chacha_text" class="font-medium">Teks Asli</label>
+              <textarea id="enc_chacha_text" name="text_data" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-primary" rows="4">{{ form_data.text_data_chacha_enc or '' }}</textarea>
+            </div>
+            <div>
+              <label for="enc_chacha_key" class="font-medium">Kunci Rahasia</label>
+              <input type="password" id="enc_chacha_key" name="secret_key" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary">
+            </div>
+            <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-orange-600 transition">Enkripsi ChaCha20</button>
+          </form>
+          <label class="block mt-4 font-medium">Hasil Enkripsi:</label>
+          <div class="bg-gray-100 rounded-lg p-3 font-mono text-sm min-h-[60px]">{{ chacha_encrypt_result or '' }}</div>
+        </div>
+
+        <!-- Dekripsi -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <h3 class="text-lg font-semibold text-primary mb-4">🔓 Dekripsi ChaCha20</h3>
+          <form action="{{ url_for('crypto_bp.decrypt_chacha') }}" method="POST" class="space-y-4">
+            <div>
+              <label for="dec_chacha_text" class="font-medium">Ciphertext (Base64)</label>
+              <textarea id="dec_chacha_text" name="text_data" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-primary" rows="4">{{ form_data.text_data_chacha_dec or '' }}</textarea>
+            </div>
+            <div>
+              <label for="dec_chacha_key" class="font-medium">Kunci Rahasia</label>
+              <input type="password" id="dec_chacha_key" name="secret_key" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary">
+            </div>
+            <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-orange-600 transition">Dekripsi ChaCha20</button>
+          </form>
+          <label class="block mt-4 font-medium">Hasil Dekripsi:</label>
+          <div class="bg-gray-100 rounded-lg p-3 font-mono text-sm min-h-[60px]">{{ chacha_decrypt_result or '' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ADFGX ========== -->
+    <div id="adfgx" class="tab-content hidden">
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Enkripsi -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <h3 class="text-lg font-semibold text-primary mb-4">🔒 Enkripsi ADFGX</h3>
+          <form action="{{ url_for('crypto_bp.encrypt_adfgx_route') }}" method="POST" class="space-y-4">
+            <div>
+              <label for="enc_adfgx_text" class="font-medium">Teks Asli</label>
+              <textarea id="enc_adfgx_text" name="text_data" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary" rows="4">{{ form_data.text_data_adfgx_enc or '' }}</textarea>
+            </div>
+            <div>
+              <label class="font-medium">Kunci Square</label>
+              <input type="text" name="adfgx_square" value="{{ form_data.adfgx_square_enc or 'phqgmeaynofdxkrcvszwbutil' }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+              <label class="font-medium">Kunci Transpose</label>
+              <input type="text" name="adfgx_transpose" value="{{ form_data.adfgx_transpose_enc or 'SECRET' }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary">
+            </div>
+            <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-orange-600 transition">Enkripsi ADFGX</button>
+          </form>
+          <label class="block mt-4 font-medium">Hasil Enkripsi:</label>
+          <div class="bg-gray-100 rounded-lg p-3 font-mono text-sm min-h-[60px]">{{ adfgx_encrypt_result or '' }}</div>
+        </div>
+
+        <!-- Dekripsi -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <h3 class="text-lg font-semibold text-primary mb-4">🔓 Dekripsi ADFGX</h3>
+          <form action="{{ url_for('crypto_bp.decrypt_adfgx_route') }}" method="POST" class="space-y-4">
+            <div>
+              <label class="font-medium">Ciphertext</label>
+              <textarea name="text_data" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary" rows="4">{{ form_data.text_data_adfgx_dec or '' }}</textarea>
+            </div>
+            <div>
+              <label class="font-medium">Kunci Square</label>
+              <input type="text" name="adfgx_square" value="{{ form_data.adfgx_square_dec or 'phqgmeaynofdxkrcvszwbutil' }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+              <label class="font-medium">Kunci Transpose</label>
+              <input type="text" name="adfgx_transpose" value="{{ form_data.adfgx_transpose_dec or 'SECRET' }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary">
+            </div>
+            <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-orange-600 transition">Dekripsi ADFGX</button>
+          </form>
+          <label class="block mt-4 font-medium">Hasil Dekripsi:</label>
+          <div class="bg-gray-100 rounded-lg p-3 font-mono text-sm min-h-[60px]">{{ adfgx_decrypt_result or '' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== SUPER ========== -->
+    <div id="super" class="tab-content hidden">
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Enkripsi -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <h3 class="text-lg font-semibold text-primary mb-4">🔒 Enkripsi Algoritma Super</h3>
+          <form action="{{ url_for('crypto_bp.encrypt_super_route') }}" method="POST" class="space-y-4">
+            <div>
+              <label class="font-medium">Teks Asli</label>
+              <textarea name="text_data" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary" rows="4">{{ form_data.text_data_super_enc or '' }}</textarea>
+            </div>
+            <div>
+              <label class="font-medium">Kunci Rahasia (ChaCha20)</label>
+              <input type="password" name="secret_key" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+              <label class="font-medium">Kunci Square (ADFGX)</label>
+              <input type="text" name="adfgx_square" value="{{ form_data.adfgx_square_super_enc or 'phqgmeaynofdxkrcvszwbutil' }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+              <label class="font-medium">Kunci Transpose (ADFGX)</label>
+              <input type="text" name="adfgx_transpose" value="{{ form_data.adfgx_transpose_super_enc or 'SECRET' }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary">
+            </div>
+            <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-orange-600 transition">Enkripsi Super</button>
+          </form>
+          <label class="block mt-4 font-medium">Hasil Enkripsi (Base64):</label>
+          <div class="bg-gray-100 rounded-lg p-3 font-mono text-sm min-h-[60px]">{{ super_encrypt_result or '' }}</div>
+        </div>
+
+        <!-- Dekripsi -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <h3 class="text-lg font-semibold text-primary mb-4">🔓 Dekripsi Algoritma Super</h3>
+          <form action="{{ url_for('crypto_bp.decrypt_super_route') }}" method="POST" class="space-y-4">
+            <div>
+              <label class="font-medium">Ciphertext (Base64)</label>
+              <textarea name="text_data" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary" rows="4">{{ form_data.text_data_super_dec or '' }}</textarea>
+            </div>
+            <div>
+              <label class="font-medium">Kunci Rahasia (ChaCha20)</label>
+              <input type="password" name="secret_key" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+              <label class="font-medium">Kunci Square (ADFGX)</label>
+              <input type="text" name="adfgx_square" value="{{ form_data.adfgx_square_super_dec or 'phqgmeaynofdxkrcvszwbutil' }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+              <label class="font-medium">Kunci Transpose (ADFGX)</label>
+              <input type="text" name="adfgx_transpose" value="{{ form_data.adfgx_transpose_super_dec or 'SECRET' }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary">
+            </div>
+            <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-orange-600 transition">Dekripsi Super</button>
+          </form>
+          <label class="block mt-4 font-medium">Hasil Dekripsi:</label>
+          <div class="bg-gray-100 rounded-lg p-3 font-mono text-sm min-h-[60px]">{{ super_decrypt_result or '' }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script Tabs -->
+  <script>
+    function openTab(evt, tabName) {
+      document.querySelectorAll(".tab-content").forEach(tab => tab.classList.add("hidden"));
+      document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("border-primary", "text-primary"));
+      document.getElementById(tabName).classList.remove("hidden");
+      evt.currentTarget.classList.add("border-primary", "text-primary");
+      localStorage.setItem("activeTabTextCrypto", tabName);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      let activeTab = localStorage.getItem("activeTabTextCrypto") || "{{ active_tab or 'chacha' }}";
+      if (!activeTab) activeTab = "chacha";
+      document.querySelector(`.tab-button[onclick*='${activeTab}']`)?.click();
+    });
+  </script>
+</body>
+</html>

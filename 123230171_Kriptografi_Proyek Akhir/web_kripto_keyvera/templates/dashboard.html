@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - KeyVera</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            poppins: ['Poppins', 'sans-serif'],
+          },
+          colors: {
+            primary: '#FF6B39',
+            secondary: '#2f3640',
+            light: '#f5f6fa',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-light min-h-screen flex items-center justify-center font-poppins">
+  <div class="bg-white shadow-lg rounded-2xl p-8 w-[700px] text-center">
+    <h2 class="text-2xl font-bold text-secondary mb-2">Halo, {{ username }} 👋</h2>
+    <p class="text-gray-600 mb-6">Selamat datang di dashboard KeyVera</p>
+
+    <div class="flex flex-col gap-3">
+      <a href="{{ url_for('main_bp.text_crypto_page') }}"
+         class="block py-3 rounded-xl border-2 border-primary text-primary font-semibold hover:bg-primary hover:text-white transition">
+        🔐 Enkripsi / Dekripsi Teks
+      </a>
+
+      <a href="{{ url_for('main_bp.file_crypto_page') }}"
+         class="block py-3 rounded-xl border-2 border-primary text-primary font-semibold hover:bg-primary hover:text-white transition">
+        📁 Enkripsi / Dekripsi File
+      </a>
+
+      <a href="{{ url_for('main_bp.steganography_page') }}"
+         class="block py-3 rounded-xl border-2 border-primary text-primary font-semibold hover:bg-primary hover:text-white transition">
+        🖼️ Steganografi Gambar
+      </a>
+
+      <a href="{{ url_for('auth_bp.logout') }}"
+         class="block py-3 rounded-xl text-gray-500 font-medium hover:text-red-500 transition">
+        🚪 Logout
+      </a>
+    </div>
+  </div>
+</body>
+</html>

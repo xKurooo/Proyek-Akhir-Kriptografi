@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Steganografi Gambar - KeyVera</title>
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { poppins: ['Poppins', 'sans-serif'] },
+          colors: {
+            primary: '#FF6B39',
+            secondary: '#2f3640',
+            light: '#f5f6fa',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-light min-h-screen font-poppins">
+  <div class="max-w-6xl mx-auto py-10 px-5">
+    <h2 class="text-3xl font-bold text-secondary text-center mb-3">
+      🖼️ Steganografi Gambar (LSB Teracak)
+    </h2>
+    <p class="text-center text-gray-600 mb-6">
+      Hanya untuk pengguna yang sudah login.
+      <a href="/" class="text-primary hover:underline font-medium">⬅️ Kembali ke Dashboard</a>
+    </p>
+
+    <p class="text-center text-sm text-gray-500 mb-8">
+      <b>INFO:</b> Metode ini menyembunyikan pesan pada piksel acak berdasarkan <b>Kunci Rahasia</b>.<br>
+      Hasil disimpan sebagai <b>.png</b> untuk menjaga kualitas data (lossless).
+    </p>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="mb-6">
+          {% for category, message in messages %}
+            <li class="{% if category == 'error' %}bg-red-100 text-red-700 border border-red-300{% elif category == 'success' %}bg-green-100 text-green-700 border border-green-300{% endif %} px-4 py-2 rounded-lg text-sm mb-2">
+              {{ message }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <div class="grid md:grid-cols-2 gap-8">
+      <!-- EMBED BOX -->
+      <div class="bg-white p-6 rounded-2xl shadow-md">
+        <h3 class="text-xl font-semibold text-secondary border-b border-gray-200 pb-2 mb-4">
+          🔒 Sembunyikan Pesan (Embed)
+        </h3>
+        <form action="{{ url_for('stego_bp.embed_image') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-secondary mb-1">Gambar Cover (.jpg / .png)</label>
+            <input type="file" name="image_file" accept="image/jpeg,image/png" required
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-secondary mb-1">Pesan Rahasia</label>
+            <textarea name="secret_message" required
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 h-28 font-mono focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-secondary mb-1">Kunci Rahasia</label>
+            <input type="password" name="secret_key" required
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+          </div>
+
+          <button type="submit"
+            class="w-full py-2.5 bg-primary text-white font-semibold rounded-lg hover:bg-orange-600 transition">
+            💾 Sembunyikan & Unduh (.png)
+          </button>
+        </form>
+      </div>
+
+      <!-- EXTRACT BOX -->
+      <div class="bg-white p-6 rounded-2xl shadow-md">
+        <h3 class="text-xl font-semibold text-secondary border-b border-gray-200 pb-2 mb-4">
+          🔓 Ekstrak Pesan (Extract)
+        </h3>
+        <form action="{{ url_for('stego_bp.extract_image') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-secondary mb-1">Gambar Stego (.png)</label>
+            <input type="file" name="stego_file" accept="image/png" required
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-secondary mb-1">Kunci Rahasia</label>
+            <input type="password" name="secret_key" required
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+          </div>
+
+          <button type="submit"
+            class="w-full py-2.5 border-2 border-primary text-primary font-semibold rounded-lg hover:bg-primary hover:text-white transition">
+            📤 Ekstrak Pesan
+          </button>
+        </form>
+
+        <div class="mt-4">
+          <label class="block text-sm font-medium text-secondary mb-1">Pesan yang Ditemukan:</label>
+          <div class="bg-gray-100 rounded-lg p-3 font-mono text-sm min-h-[60px]">
+            {{ extracted_message or 'Belum ada pesan diekstrak.' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
